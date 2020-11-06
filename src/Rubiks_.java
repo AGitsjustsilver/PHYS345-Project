@@ -42,7 +42,7 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
         Button b = new Button(label);
         b.addActionListener(this);
         b.addKeyListener(IJ.getInstance());
-        panel.add(b)
+        panel.add(b);
     }
 
     @Override
