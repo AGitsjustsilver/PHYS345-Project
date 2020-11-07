@@ -1,0 +1,54 @@
+@startuml
+class Rubiks_ {
+    - Panel panel
+    - int previousID
+    {static} - Frame instance
+    ~ String[] choices
+
+    ~ void addButton(String label, int index)
+    + void actionPerformed(ActionEvent e)
+    + void processWindowEvent(WindowEvent e)
+}
+class Runner {
+    - String command
+    - ImagePlus imp
+    ~Runner(String command, ImagePlus imp)
+    + void run()
+    ~ void runCommand(String command, ImagePlus imp)
+
+}
+class Grey_Rubiks {
+    + _Rubiks(ImageJ imp, ImageProcessor ip)
+    + void encrypt()
+    + void decrypt()
+
+}
+class RGB_Rubiks {
+    + _Rubiks(ImageJ imp, ImageProcessor ip)
+    + void encrypt()
+    + void decrypt()
+
+}
+abstract class Rubiks {
+    {abstract} + void encrypt()
+    {abstract} + void decrypt()
+}
+interface ActionListener
+class PlugInFrame
+class Thread
+
+
+RGB_Rubiks --|> Grey_Rubiks  : extends
+RGB_Rubiks --* Rubiks_ : contains
+
+Grey_Rubiks --* Rubiks_ : contains
+Grey_Rubiks --|> Rubiks : extends
+
+Rubiks_ --|> PlugInFrame : extends
+Rubiks_ --|> ActionListener
+
+Runner --+ Rubiks_ : innerclass
+Runner --|> Thread : extends
+
+hide empty members
+@enduml
