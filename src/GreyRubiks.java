@@ -1,9 +1,9 @@
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
-public class Grey_Rubiks extends Rubiks {
+public class GreyRubiks extends Rubiks {
 
-    public Grey_Rubiks(ImagePlus imp, ImageProcessor ip){
+    public GreyRubiks(ImagePlus imp, ImageProcessor ip){
         super.imp = imp;
         super.ip = ip;
         generateVector();

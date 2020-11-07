@@ -17,13 +17,13 @@ class Runner {
     ~ void runCommand(String command, ImagePlus imp)
 
 }
-class Grey_Rubiks {
+class GreyRubiks {
     + _Rubiks(ImageJ imp, ImageProcessor ip)
     + void encrypt()
     + void decrypt()
 
 }
-class RGB_Rubiks {
+class RGBRubiks {
     + _Rubiks(ImageJ imp, ImageProcessor ip)
     + void encrypt()
     + void decrypt()
@@ -38,11 +38,11 @@ class PlugInFrame
 class Thread
 
 
-RGB_Rubiks --|> Grey_Rubiks  : extends
-RGB_Rubiks --* Rubiks_ : contains
+RGBRubiks --|> GreyRubiks  : extends
+RGBRubiks --* Rubiks_ : contains
 
-Grey_Rubiks --* Rubiks_ : contains
-Grey_Rubiks --|> Rubiks : extends
+GreyRubiks --* Rubiks_ : contains
+GreyRubiks --|> Rubiks : extends
 
 Rubiks_ --|> PlugInFrame : extends
 Rubiks_ --|> ActionListener

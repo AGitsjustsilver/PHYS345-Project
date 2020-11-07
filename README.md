@@ -9,14 +9,14 @@ Implementation and expansion on the rubik's cube based image encryption algorith
     - encrypt
     - decrypt
   - contains helper code to assist extending classes
-* Grey_Rubiks.java
+* GreyRubiks.java
   - extends Rubiks.java
   - 
-* RGB_Rubiks.java
+* RGBRubiks.java
   - sds
 ```
             ,---------------------------------------.                                              
-            |RGB_Rubiks                             |                                              
+            |RGBRubiks                             |                                              
             |---------------------------------------|                                              
             |---------------------------------------|                                              
             |+_Rubiks(ImageJ imp, ImageProcessor ip)|                                              
@@ -27,7 +27,7 @@ Implementation and expansion on the rubik's cube based image encryption algorith
                                                                                                    
                                                   ,-----------------------------------------------.
 ,---------------------------------------.         |Runner                                         |
-|Grey_Rubiks                            |         |-----------------------------------------------|
+|GreyRubiks                            |         |-----------------------------------------------|
 |---------------------------------------|         |-String command                                |
 |---------------------------------------|         |-ImagePlus imp                                 |
 |+_Rubiks(ImageJ imp, ImageProcessor ip)|         |-----------------------------------------------|
