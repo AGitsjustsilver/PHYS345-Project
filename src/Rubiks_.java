@@ -119,11 +119,11 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
             if (command.equals(choices[0])){
                 msg = choices[0] + " is not implemented ";
             }else if (command.equals(choices[1])) {
-                msg = choices[1] + " is not implemented";
+                msg = choices[1] + " is not implemented ";
             }else if (command.equals(choices[2])) {
-                msg = choices[2] + " is not implemented";
+                msg = choices[2] + " is not implemented ";
             }else if (command.equals(choices[3])) {
-                msg = choices[3] + " is not implemented";
+                msg = choices[3] + " is not implemented ";
             }
             imp.updateAndDraw();
             imp.unlock();
