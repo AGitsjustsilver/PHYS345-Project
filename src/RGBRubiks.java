@@ -1,10 +1,10 @@
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
-public class RGBRubiks extends GreyRubiks {
+public class RGBRubiks extends ByteRubiks {
 
     public RGBRubiks(ImagePlus imp, ImageProcessor ip){
-        super(imp, ip);
+
     }
 
     @Override
