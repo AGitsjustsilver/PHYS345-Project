@@ -5,7 +5,6 @@
 * Code Written By: Alessandro Guaresti
 * */
 
-
 import ij.*;
 import ij.gui.*;
 import ij.plugin.frame.PlugInFrame;
@@ -85,12 +84,14 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
 
     class Runner extends Thread {
         private String command;
+        private Choices choice;
         private ImagePlus imp;
 
         Runner(String command, ImagePlus imp){
             super(command);
             this.command = command;
             this.imp = imp;
+            this.choice = Choices.GREY;
             setPriority(Math.max(getPriority()-2, MIN_PRIORITY));
             start();
         }
@@ -115,19 +116,38 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
             ImageProcessor ip = imp.getProcessor();
             IJ.showStatus(command + "...");
             long startTime = System.currentTimeMillis();
+            Rubiks rubiks;
             String msg = "";
-            if (command.equals(choices[0])){
-                msg = choices[0] + " is not implemented ";
-            }else if (command.equals(choices[1])) {
-                msg = choices[1] + " is not implemented ";
-            }else if (command.equals(choices[2])) {
-                msg = choices[2] + " is not implemented ";
-            }else if (command.equals(choices[3])) {
-                msg = choices[3] + " is not implemented ";
+            switch (this.choice){
+                case GREY:
+                    rubiks = new ByteRubiks(ip);
+                    if (command.equals(choices[0])){
+                        rubiks.encrypt();
+                        msg = choices[0] + " took ";
+                    }else if (command.equals(choices[1])) {
+                        rubiks.decrypt();
+                        msg = choices[1] + " is not implemented ";
+                    }
+                    break;
+                case RGB:
+                    rubiks = new RGBRubiks(imp, ip);
+                    if (command.equals(choices[2])) {
+                        rubiks.encrypt();
+                        msg = choices[2] + " is not implemented ";
+                    }else if (command.equals(choices[3])) {
+                        rubiks.decrypt();
+                        msg = choices[3] + " is not implemented ";
+                    }
+                    break;
             }
             imp.updateAndDraw();
             imp.unlock();
             IJ.showStatus(msg + (System.currentTimeMillis()-startTime)+" milliseconds");
         }
     }
+}
+
+enum Choices{
+    GREY,
+    RGB
 }

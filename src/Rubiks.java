@@ -14,25 +14,24 @@ abstract class Rubiks {
     private final int ITERMAX = 1;
 
 
-    public ImagePlus imp;
     public ImageProcessor ip;
     public int[][] imgArr;
 
     public Rubiks(){
-        this.imp = new ImagePlus();
         this.ip = null;
+        this.imgArr = null;
         this.generateVectors();
     }
 
     public Rubiks(String path){
-        this.imp = new ImagePlus(path);
-        this.ip = imp.getProcessor();
+        this.ip = new ImagePlus(path).getProcessor();
+        this.imgArr = this.ip.getIntArray();
         this.generateVectors();
     }
 
-    public Rubiks(ImagePlus imagePlus, ImageProcessor imageProcessor){
-        this.imp = imagePlus;
+    public Rubiks(ImageProcessor imageProcessor){
         this.ip = imageProcessor;
+        this.imgArr = this.ip.getIntArray();
         this.generateVectors();
     }
 

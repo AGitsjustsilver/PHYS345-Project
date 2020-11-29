@@ -1,4 +1,3 @@
-import ij.ImagePlus;
 import ij.process.*;
 
 public class ByteRubiks extends Rubiks {
@@ -7,8 +6,8 @@ public class ByteRubiks extends Rubiks {
         super();
     }
 
-    public ByteRubiks(ImagePlus imp, ImageProcessor ip){
-        super(imp, ip);
+    public ByteRubiks(ImageProcessor ip){
+        super(ip);
     }
 
     @Override
@@ -75,6 +74,7 @@ public class ByteRubiks extends Rubiks {
             }
 //        * 8. if iter and iterMax are equal then its done else go again
         }
+        this.ip.setIntArray(this.imgArr);
     }
 
     @Override
