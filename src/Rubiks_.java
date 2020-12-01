@@ -46,6 +46,7 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
         setVisible(true);
     }
 
+    //TODO: Fix potential recreation of instances based on button press.
     void addButton(String label, int index) {
         Button b = new Button(label);
         b.addActionListener(this);
@@ -54,7 +55,7 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) { // might be the point at which it re runs?
         ImagePlus imp = WindowManager.getCurrentImage();
         if(imp==null) {
             IJ.beep();
@@ -85,20 +86,30 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
     class Runner extends Thread {
         private String command;
         private Choices choice;
+        private Rubiks rubiks;
         private ImagePlus imp;
 
         Runner(String command, ImagePlus imp){
             super(command);
             this.command = command;
             this.imp = imp;
+            //TODO: differentiate between n-bit GREYS and RGB
             this.choice = Choices.GREY;
+            switch (this.choice){
+                case GREY:
+                    this.rubiks = new ByteRubiks();
+                    break;
+                case RGB:
+                    break;
+            }
+
             setPriority(Math.max(getPriority()-2, MIN_PRIORITY));
             start();
         }
 
         public void run(){
             try {
-                runCommand(command, imp);
+                runCommand(command, imp, rubiks);
             } catch (OutOfMemoryError e){
                 IJ.outOfMemory(command);
                 if (imp!=null) imp.unlock();
@@ -112,11 +123,10 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
             }
         }
 
-        void runCommand(String command, ImagePlus imp){
+        void runCommand(String command, ImagePlus imp, Rubiks rubiks){
             ImageProcessor ip = imp.getProcessor();
             IJ.showStatus(command + "...");
             long startTime = System.currentTimeMillis();
-            Rubiks rubiks;
             String msg = "";
             switch (this.choice){
                 case GREY:

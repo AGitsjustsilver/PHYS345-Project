@@ -11,7 +11,7 @@ abstract class Rubiks {
     private Vector<BigInteger> vectR; // true
     private Vector<BigInteger> vectC; // false
     private int bitSize;
-    private final int ITERMAX = 1;
+    private final int ITERMAX = 1; // the higher the more secure
 
 
     public ImageProcessor ip;
@@ -52,7 +52,7 @@ abstract class Rubiks {
         return sum;
     }
 
-    public void shift(Dir d, int index){
+    public void shift(Dir d, int index, boolean key){
         // col = UP/DOWN = true
         // row = LEFT/RIGHT = false;
         boolean direction = (d == Dir.UP)||(d == Dir.DOWN);
@@ -61,18 +61,20 @@ abstract class Rubiks {
             d = (d == Dir.UP)? Dir.LEFT: Dir.RIGHT;
         }
         int bound = this.imgArr[index].length-1;
-        if (d == Dir.RIGHT){
-            // shift ->
-            for (int row = 0; row < bound; row++){
-                swap(this.imgArr[index], row, row+1);
+        for (int i = 0; i < getKey(key, index); i++) {
+            if (d == Dir.RIGHT){
+                // shift ->
+                for (int row = 0; row < bound; row++){
+                    swap(this.imgArr[index], row, row+1);
+                }
+                swap(this.imgArr[index], bound-1, bound);
+            }else {
+                // shift <-
+                for (int row = bound; row > 0; row--){
+                    swap(this.imgArr[index], row-1, row);
+                }
+                swap(this.imgArr[index], 1, 0);
             }
-            swap(this.imgArr[index], bound-1, bound);
-        }else {
-            // shift <-
-            for (int row = bound; row > 0; row--){
-                swap(this.imgArr[index], row-1, row);
-            }
-            swap(this.imgArr[index], 1, 0);
         }
         if(direction)
             this.colSwitch();
