@@ -18,11 +18,7 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
     private Panel panel;
     private int previousID;
     private static Frame instance;
-
-    final String[] choices = {"Grey-Encrypt",
-                              "Grey-Decrypt",
-                              "RGB-Encrypt",
-                              "RGB-Decrypt"};
+    private Rubiks rubiks;
 
     public Rubiks_() {
         super("Rubik's Encrypt/Decrypt");
@@ -35,10 +31,13 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
 
         setLayout(new FlowLayout());
         panel = new Panel();
-        panel.setLayout(new GridLayout(2,2,3,3));
-        for (int i=0; i<choices.length;i++){
-            addButton(choices[i],i);
-        }
+        panel.setLayout(new GridLayout(3,2,3,3));
+        addButton("Reset", 0);
+        addButton("New-Vectors", 1);
+        addButton("Grey-Encrypt",2 );
+        addButton("Grey-Decrypt", 3);
+        addButton("RGB-Encrypt", 4);
+        addButton("RGB-Decrypt", 5);
         add(panel);
 
         pack();
@@ -73,7 +72,7 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
         }
         previousID = id;
         String label = e.getActionCommand();
-        new Runner(label, imp);
+        new Runner(label, imp, Choices.GREY, this.rubiks);
     }
 
     public void processWindowEvent(WindowEvent e){
@@ -88,23 +87,29 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
         private Choices choice;
         private Rubiks rubiks;
         private ImagePlus imp;
+        private VectorKeys vect;
 
-        Runner(String command, ImagePlus imp){
+        Runner(String command, ImagePlus imp, VectorKeys v, Rubiks r){
             super(command);
             this.command = command;
             this.imp = imp;
-            //TODO: differentiate between n-bit GREYS and RGB
-            this.choice = Choices.GREY;
-            switch (this.choice){
-                case GREY:
-                    this.rubiks = new ByteRubiks();
-                    break;
-                case RGB:
-                    break;
-            }
-
+            this.choice = this.imageType();
+            this.vect = v;
+            this.rubiks = r;
             setPriority(Math.max(getPriority()-2, MIN_PRIORITY));
             start();
+        }
+
+        private Choices imageType(){
+             switch (this.imp.getCompositeMode()){
+                 case IJ.GRAYSCALE:
+                     return Choices.GREY;
+                 case IJ.COMPOSITE:
+                 case IJ.COLOR:
+                     return Choices.RGB;
+                 default:
+                     return null;
+             }
         }
 
         public void run(){
@@ -131,24 +136,30 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
             switch (this.choice){
                 case GREY:
                     rubiks = new ByteRubiks(ip);
-                    if (command.equals(choices[0])){
+                    if (command.equals("Grey-Encrypt")){
                         rubiks.encrypt();
-                        msg = choices[0] + " took ";
-                    }else if (command.equals(choices[1])) {
+                        msg = "Grey-Encrypt took ";
+                    }else if (command.equals("Grey-Decrypt")) {
                         rubiks.decrypt();
-                        msg = choices[1] + " is not implemented ";
+                        msg = "Grey-Decrypt took ";
                     }
                     break;
                 case RGB:
                     rubiks = new RGBRubiks(imp, ip);
-                    if (command.equals(choices[2])) {
+                    if (command.equals("RGB-Encrypt")) {
                         rubiks.encrypt();
-                        msg = choices[2] + " is not implemented ";
-                    }else if (command.equals(choices[3])) {
+                        msg = "RGB-Encrypt took ";
+                    }else if (command.equals("RGB-Decrypt")) {
                         rubiks.decrypt();
-                        msg = choices[3] + " is not implemented ";
+                        msg = "RGB-Decrypt took ";
                     }
                     break;
+                default:
+                    if (command.equals("reset")){
+                        ip.reset();
+                    }else if (command.equals("New-Vectors")){
+
+                    }
             }
             imp.updateAndDraw();
             imp.unlock();

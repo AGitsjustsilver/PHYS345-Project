@@ -13,21 +13,8 @@ abstract class Rubiks {
     private int bitSize;
     private final int ITERMAX = 1; // the higher the more secure
 
-
     public ImageProcessor ip;
     public int[][] imgArr;
-
-    public Rubiks(){
-        this.ip = null;
-        this.imgArr = null;
-        this.generateVectors();
-    }
-
-    public Rubiks(String path){
-        this.ip = new ImagePlus(path).getProcessor();
-        this.imgArr = this.ip.getIntArray();
-        this.generateVectors();
-    }
 
     public Rubiks(ImageProcessor imageProcessor){
         this.ip = imageProcessor;

@@ -1,11 +1,6 @@
 import ij.process.*;
 
 public class ByteRubiks extends Rubiks {
-
-    public ByteRubiks(){
-        super();
-    }
-
     public ByteRubiks(ImageProcessor ip){
         super(ip);
     }
