@@ -1,8 +1,8 @@
 import ij.process.*;
 
 public class ByteRubiks extends Rubiks {
-    public ByteRubiks(ImageProcessor ip){
-        super(ip);
+    public ByteRubiks(ImageProcessor ip, VectorKeys keys){
+        super(ip, keys);
     }
 
     @Override
@@ -10,17 +10,15 @@ public class ByteRubiks extends Rubiks {
 //         Algorithm Steps
 //        * 1. Generate 2 different size arrays R and C
 //        * 2. Determine the max number of Iterations //
-        int iter = 0,
-            width = this.ip.getWidth(),
-            height = this.ip.getHeight();
+        int iter = 0;
 
-        while (!checkIter(iter)) {
+        while (checkIteratorMax(iter)) {
 //        * 3. Increment iterator by 1
             iter++;
-            this.rowShift(width);
-            this.colShift(height);
-            this.rowXOR(height, width);
-            this.colXOR(height, width);
+            this.rowShift();
+            this.colShift();
+            this.rowXOR();
+            this.colXOR();
 
 //        * 8. if iter and iterMax are equal then its done else go again
         }
@@ -31,22 +29,50 @@ public class ByteRubiks extends Rubiks {
 
     @Override
     public void decrypt() {
-        int iter = 0,
-                width = this.ip.getWidth(),
-                height = this.ip.getHeight();
+        int iter = 0;
 
-        while(!checkIter(iter)){
+        while(checkIteratorMax(iter)){
             iter++;
-            this.colXOR(height, width);
-            this.rowXOR(height, width);
-            this.colShift(height);
-            this.rowShift(width);
+            this.colXOR();
+            this.rowXOR();
+            this.colShift();
+            this.rowShift();
         }
 
         this.ip.setIntArray(this.imgArr);
     }
 
-    private void rowShift(int width){
+    @Override
+    protected void shiftElements(Direction d, int index, boolean key) {
+        // col = UP/DOWN = true
+        // row = LEFT/RIGHT = false;
+        boolean direction = (d == Direction.UP)||(d == Direction.DOWN);
+        if(direction) {
+            this.colSwitch();
+            d = (d == Direction.UP)? Direction.LEFT: Direction.RIGHT;
+        }
+        int bound = this.imgArr[index].length-1;
+        for (int i = 0; i < getKey(key, index); i++) {
+            if (d == Direction.RIGHT){
+                // shift ->
+                for (int row = 0; row < bound; row++){
+                    swap(this.imgArr[index], row, row+1);
+                }
+                swap(this.imgArr[index], bound-1, bound);
+            }else {
+                // shift <-
+                for (int row = bound; row > 0; row--){
+                    swap(this.imgArr[index], row-1, row);
+                }
+                swap(this.imgArr[index], 1, 0);
+            }
+        }
+        if(direction)
+            this.colSwitch();
+    }
+
+    @Override
+    protected void rowShift(){
         //        * 4. For each row of image:
         for(int row=0; row < width; row++) {
 //        *   a. calculate sum all values in row
@@ -54,15 +80,16 @@ public class ByteRubiks extends Rubiks {
             // shift multiple times by the vector value at the index
             if(arrSum(this.imgArr[row])%2==0) {
 //        *   c. if 0 -> right circular shift
-                shift(Dir.RIGHT, row, true);
+                shiftElements(Direction.RIGHT, row, true);
             }else {
 //        *      else -> left circular shift
-                shift(Dir.LEFT, row, true);
+                shiftElements(Direction.LEFT, row, true);
             }
         }
     }
 
-    private void colShift(int height){
+    @Override
+    protected void colShift(){
         //        * 5. For each column of image:
         for(int col=0; col < height; col++) {
 //        *   a. calculate the sum of all column values
@@ -70,15 +97,16 @@ public class ByteRubiks extends Rubiks {
             // shift multiple times by the vector value at the index
             if(arrSum(this.imgArr[col]) % 2 == 0) {
 //        *   c. if 0 -> up circular shift
-                shift(Dir.UP,col, false);
+                shiftElements(Direction.UP,col, false);
             }else {
 //        *      else ->down circular shift
-                shift(Dir.DOWN,col, false);
+                shiftElements(Direction.DOWN,col, false);
             }
         }
     }
 
-    private void rowXOR(int height, int width){
+    @Override
+    protected void rowXOR(){
         //        * 6. Using Vector Key C apply XOR to rows
         for (int i = 0; i < width; i++) {
             if (i%2!=0) {
@@ -89,13 +117,14 @@ public class ByteRubiks extends Rubiks {
             }else {
                 // b. Image[2i][j] (even rows) get left bit shifted C[j]
                 for (int j = 0; j < height; j++) {
-                    xorRotShift(i,j,false);
+                    rotXorShift(i,j,false);
                 }
             }
         }
     }
 
-    private void colXOR(int height, int width){
+    @Override
+    protected void colXOR(){
         //        * 7. Using Vector Key R apply XOR to columns
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
@@ -104,9 +133,26 @@ public class ByteRubiks extends Rubiks {
                     xorShift(i,j,true);
                 }else {
                     // b. Image[i][2j] (even columns) get left bit shifted R[j]
-                    xorRotShift(i,j,true);
+                    rotXorShift(i,j,true);
                 }
             }
         }
+    }
+
+    @Override
+    protected void xorShift(int i, int j, boolean key){
+        this.imgArr[i][j] = this.imgArr[i][j] ^ getKey(key, j);
+    }
+
+    @Override
+    protected void rotXorShift(int i, int j, boolean key){
+        this.imgArr[i][j] = this.imgArr[i][j] ^ (getKey(key, j) >> 1);
+    }
+
+    // object
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }

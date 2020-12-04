@@ -1,36 +1,30 @@
-import ij.*;
 import ij.process.ImageProcessor;
-import java.math.BigInteger;
-import java.util.Vector;
-import java.security.SecureRandom;
+
+import java.util.Arrays;
 /*
  * The back end methods for the plugin interface
  * */
 
 abstract class Rubiks {
-    private Vector<BigInteger> vectR; // true
-    private Vector<BigInteger> vectC; // false
-    private int bitSize;
-    private final int ITERMAX = 1; // the higher the more secure
+    private VectorKeys vectKey;
+    private final int ITERATOR_MAX = 1; // the higher the more secure
 
     public ImageProcessor ip;
+    public int width;
+    public int height;
     public int[][] imgArr;
 
-    public Rubiks(ImageProcessor imageProcessor){
+    public Rubiks(ImageProcessor imageProcessor, VectorKeys keys){
         this.ip = imageProcessor;
+        this.vectKey = keys;
+        this.width = ip.getWidth();
+        this.height = ip.getHeight();
         this.imgArr = this.ip.getIntArray();
-        this.generateVectors();
     }
 
     //methods
-    public void generateVectors(){
-        this.bitSize = ip.getBitDepth();
-        this.vectR = this.generateVector(ip.getWidth());
-        this.vectC = this.generateVector(ip.getHeight());
-    }
-
-    public boolean checkIter(int iter){
-        return (iter == ITERMAX);
+    public boolean checkIteratorMax(int iter){
+        return !(iter == ITERATOR_MAX);
     }
 
     public int arrSum(int[] arr){
@@ -39,90 +33,56 @@ abstract class Rubiks {
         return sum;
     }
 
-    public void shift(Dir d, int index, boolean key){
-        // col = UP/DOWN = true
-        // row = LEFT/RIGHT = false;
-        boolean direction = (d == Dir.UP)||(d == Dir.DOWN);
-        if(direction) {
-            this.colSwitch();
-            d = (d == Dir.UP)? Dir.LEFT: Dir.RIGHT;
-        }
-        int bound = this.imgArr[index].length-1;
-        for (int i = 0; i < getKey(key, index); i++) {
-            if (d == Dir.RIGHT){
-                // shift ->
-                for (int row = 0; row < bound; row++){
-                    swap(this.imgArr[index], row, row+1);
-                }
-                swap(this.imgArr[index], bound-1, bound);
-            }else {
-                // shift <-
-                for (int row = bound; row > 0; row--){
-                    swap(this.imgArr[index], row-1, row);
-                }
-                swap(this.imgArr[index], 1, 0);
-            }
-        }
-        if(direction)
-            this.colSwitch();
+    public int getKey(boolean key, int pos){
+        return this.vectKey.getIntKey(key, pos);
     }
 
-    public void xorShift(int i, int j, boolean key){
-        this.imgArr[i][j] = this.imgArr[i][j] ^ getKey(key, j);
-    }
-
-    public void xorRotShift(int i, int j, boolean key){
-        this.imgArr[i][j] = this.imgArr[i][j] ^ ( getKey(key, j) << 1);
-    }
-
-    private int getKey(boolean key, int pos){
-        return ((key)? this.vectR.get(pos): this.vectC.get(pos)).intValue();
-    }
-
-    private void swap(int[] arr, int indexA, int indexB){
+    public void swap(int[] arr, int indexA, int indexB){
         int temp = arr[indexA];
         arr[indexA] = arr[indexB];
         arr[indexB] = temp;
     }
 
-    private void colSwitch(){
-        int rowLen = ip.getWidth(),
-                colLen = ip.getHeight();
-        int[][] temp = new int[rowLen][colLen];
-        for (int row = 0; row < rowLen; row++){
-            for (int col = 0; col < colLen; col++){
-                temp[col][row] = this.imgArr[row][col];
+    public void colSwitch(){
+        int rowLen = this.imgArr.length,
+            colLen = this.imgArr[0].length;
+        int[][] temp = new int[colLen][rowLen];
+        for (int row = 0; row < colLen; row++){
+            for (int col = 0; col < rowLen; col++){
+                temp[row][col] = this.imgArr[col][row];
             }
         }
         this.imgArr = temp;
-    }
-
-    private Vector<BigInteger> generateVector(int size){
-        /*Each vector is to take a random */
-        Vector<BigInteger> v = new Vector<>();
-        for (int i = 0; i < size; i++) {
-            v.add(new BigInteger(this.bitSize, new SecureRandom()));
-        }
-        return v;
     }
 
     // actions that each individual rubiks type has to do with
     public abstract void encrypt();
     public abstract void decrypt();
 
-    public static void main(String[] args) {
-        int size = 80;
-        Vector<BigInteger> v = new Vector<>(size);
-        for (int i = 0; i < size; i++) {
-            v.add(new BigInteger(8, new SecureRandom()));
-        }
-        System.out.println(v.toString());
-    }
-}
+    protected abstract void rowShift();
+    protected abstract void colShift();
+    protected abstract void rowXOR();
+    protected abstract void colXOR();
 
-enum Dir {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT
+    protected abstract void shiftElements(Direction direction, int index, boolean key);
+    protected abstract void xorShift(int i, int j, boolean key);
+    protected abstract void rotXorShift(int i, int j, boolean key);
+
+    // object
+
+
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+        for (int[] i : this.imgArr) {
+            str.append(Arrays.toString(i));
+            str.append("\n");
+        }
+        return "Rubiks{" +
+                "\nvectKey=" + vectKey.toString() +
+                "\n, ITERMAX=" + ITERATOR_MAX +
+                "\n, ip=" + ip +
+                "\n, imgArr=" + str.toString() +
+                "\n}\n";
+    }
 }

@@ -7,6 +7,8 @@
 
 import ij.*;
 import ij.gui.*;
+import ij.io.LogStream;
+import ij.io.Opener;
 import ij.plugin.frame.PlugInFrame;
 import ij.process.ImageProcessor;
 
@@ -18,6 +20,9 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
     private Panel panel;
     private int previousID;
     private static Frame instance;
+
+    private ImagePlus currImage;
+    private VectorKeys vect;
     private Rubiks rubiks;
 
     public Rubiks_() {
@@ -42,6 +47,12 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
 
         pack();
         GUI.center(this);
+
+        this.currImage = null;
+        this.vect = new VectorKeys();
+
+        LogStream.redirectSystem();
+
         setVisible(true);
     }
 
@@ -54,7 +65,7 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) { // might be the point at which it re runs?
+    public void actionPerformed(ActionEvent e) {
         ImagePlus imp = WindowManager.getCurrentImage();
         if(imp==null) {
             IJ.beep();
@@ -66,13 +77,22 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
             previousID = 0;
             return;
         }
-        int id = imp.getID();
+        int id = imp.getID();// vectors still resetting
         if (id!=previousID){
+            System.out.println("New Image!");
             imp.getProcessor().snapshot();
+            this.currImage = imp;
+            this.vect = new VectorKeys(imp);
         }
         previousID = id;
         String label = e.getActionCommand();
-        new Runner(label, imp, Choices.GREY, this.rubiks);
+        new Runner(label, imp, this.vect, this.rubiks);
+    }
+
+    @Override
+    public void windowClosing(WindowEvent e){
+        LogStream.revertSystem();
+        super.windowClosing(e);
     }
 
     public void processWindowEvent(WindowEvent e){
@@ -93,7 +113,7 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
             super(command);
             this.command = command;
             this.imp = imp;
-            this.choice = this.imageType();
+            this.choice = (command.equals("Reset")||command.equals("New-Vectors"))? Choices.CMD: this.imageType();
             this.vect = v;
             this.rubiks = r;
             setPriority(Math.max(getPriority()-2, MIN_PRIORITY));
@@ -101,20 +121,23 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
         }
 
         private Choices imageType(){
-             switch (this.imp.getCompositeMode()){
-                 case IJ.GRAYSCALE:
+            int type = this.imp.getType();
+            System.out.println("TYPE = " + type);
+             switch (type){
+                 case ImagePlus.GRAY8:
+                 case ImagePlus.GRAY16:
+                 case ImagePlus.GRAY32:
                      return Choices.GREY;
-                 case IJ.COMPOSITE:
-                 case IJ.COLOR:
+                 case ImagePlus.COLOR_256:
                      return Choices.RGB;
                  default:
-                     return null;
+                     return Choices.CMD;
              }
         }
 
         public void run(){
             try {
-                runCommand(command, imp, rubiks);
+                runCommand(command, imp);
             } catch (OutOfMemoryError e){
                 IJ.outOfMemory(command);
                 if (imp!=null) imp.unlock();
@@ -128,37 +151,50 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
             }
         }
 
-        void runCommand(String command, ImagePlus imp, Rubiks rubiks){
+        void runCommand(String command, ImagePlus imp){
             ImageProcessor ip = imp.getProcessor();
             IJ.showStatus(command + "...");
             long startTime = System.currentTimeMillis();
             String msg = "";
             switch (this.choice){
                 case GREY:
-                    rubiks = new ByteRubiks(ip);
+                    rubiks = new ByteRubiks(ip,this.vect);
                     if (command.equals("Grey-Encrypt")){
                         rubiks.encrypt();
-                        msg = "Grey-Encrypt took ";
+                        msg = "Grey-Encrypt took: ";
                     }else if (command.equals("Grey-Decrypt")) {
                         rubiks.decrypt();
-                        msg = "Grey-Decrypt took ";
+                        msg = "Grey-Decrypt took: ";
                     }
+                    System.out.println(rubiks.toString());
                     break;
                 case RGB:
-                    rubiks = new RGBRubiks(imp, ip);
+                    rubiks = new RGBRubiks(ip,this.vect);
                     if (command.equals("RGB-Encrypt")) {
                         rubiks.encrypt();
-                        msg = "RGB-Encrypt took ";
+                        msg = "RGB-Encrypt took: ";
                     }else if (command.equals("RGB-Decrypt")) {
                         rubiks.decrypt();
-                        msg = "RGB-Decrypt took ";
+                        msg = "RGB-Decrypt took: ";
                     }
+                    System.out.println(rubiks.toString());
                     break;
-                default:
-                    if (command.equals("reset")){
+                case CMD:
+                    if (command.equals("Reset")){
                         ip.reset();
+                        msg = "Image Reset. It took: ";
+                        System.out.println("Resetting Image");
                     }else if (command.equals("New-Vectors")){
-
+                        GenericDialog gd = new GenericDialog("Warning");
+                        gd.addMessage("This recreates the Vectors for the image.\n Further Decryption will not work.");
+                        gd.showDialog();
+                        if(!gd.wasCanceled()) {
+                            VectorKeys.updateKeys(this.vect, imp);
+                            msg = "Keys were remade. It took: ";
+                            System.out.println("Keys Remade\n" + this.vect.toString());
+                        }else {
+                            msg = "Keys stay the same. It took: ";
+                        }
                     }
             }
             imp.updateAndDraw();
@@ -166,9 +202,6 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
             IJ.showStatus(msg + (System.currentTimeMillis()-startTime)+" milliseconds");
         }
     }
-}
 
-enum Choices{
-    GREY,
-    RGB
+    public static void main(String[] args) {}
 }
