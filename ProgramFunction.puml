@@ -1,0 +1,37 @@
+@startuml
+(*) --> "ImageJ"
+"ImageJ" ->[run plugin] "Abstract PluginFrame"
+
+"Abstract PluginFrame" ->[draw] "PluginFrame"
+
+"PluginFrame" -->[Listen for event] "PluginFrame"
+"PluginFrame" -->[Close PluginFrame] (*)
+"PluginFrame" -->[Event press] "new Runner"
+
+note right
+    every time there is a new event
+    a new runner is created
+    only performing one action
+    and then disposed of after
+    performing the action
+end note
+
+"new Runner" -->[Do 1 action] ===B1===
+===B1=== --> "Reset"
+===B1=== --> "New-Vectors"
+===B1=== --> "Grey"
+"Grey" --> "Encrypt"
+"Grey" --> "Decrypt"
+
+===B1=== --> "RGB"
+"RGB" --> "Encrypt"
+"RGB" --> "Decrypt"
+
+===B2=== -->[action performed] "PluginFrame"
+
+"Reset" --> ===B2====
+"New-Vectors" --> ===B2====
+"Encrypt" --> ===B2====
+"Decrypt" --> ===B2====
+
+@enduml

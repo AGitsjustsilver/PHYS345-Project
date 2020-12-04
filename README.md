@@ -9,48 +9,10 @@ Implementation and expansion on the rubik's cube based image encryption algorith
     - encrypt
     - decrypt
   - contains helper code to assist extending classes
-* GreyRubiks.java
+* ByteRubiks.java
   - extends Rubiks.java
-  - 
+  - performs encryption and decryption on n-bit grey images.
 * RGBRubiks.java
-  - sds
-```
-            ,---------------------------------------.                                              
-            |RGBRubiks                             |                                              
-            |---------------------------------------|                                              
-            |---------------------------------------|                                              
-            |+_Rubiks(ImageJ imp, ImageProcessor ip)|                                              
-            |+void encrypt()                        |                                              
-            |+void decrypt()                        |                                              
-            `---------------------------------------'                                              
-                                                                                                   
-                                                                                                   
-                                                  ,-----------------------------------------------.
-,---------------------------------------.         |Runner                                         |
-|GreyRubiks                            |         |-----------------------------------------------|
-|---------------------------------------|         |-String command                                |
-|---------------------------------------|         |-ImagePlus imp                                 |
-|+_Rubiks(ImageJ imp, ImageProcessor ip)|         |-----------------------------------------------|
-|+void encrypt()                        |         |~Runner(String command, ImagePlus imp)         |
-|+void decrypt()                        |         |+void run()                                    |
-`---------------------------------------'         |~void runCommand(String command, ImagePlus imp)|
-                                                  `-----------------------------------------------'
-                                                                          |                        
-                         ,----------------------------------------.       |                        
-                         |Rubiks_                                 |       |                        
-                         |----------------------------------------|       |                        
-     ,---------------.   |-Panel panel                            |       |                        
-     |Rubiks         |   |-int previousID                         |       |                        
-     |---------------|   |-Frame instance                         |   ,------.                     
-     |---------------|   |~String[] choices                       |   |Thread|                     
-     |+void encrypt()|   |----------------------------------------|   `------'                     
-     |+void decrypt()|   |~void addButton(String label, int index)|                                
-     `---------------'   |+void actionPerformed(ActionEvent e)    |                                
-                         |+void processWindowEvent(WindowEvent e) |                                
-                         `----------------------------------------'                                
-                                                                                                   
-                                                                                                   
-                             ,--------------.   ,-----------.                                      
-                             |ActionListener|   |PlugInFrame|                                      
-                             `--------------'   `-----------'                                      
-```
+  - extends ByteRubiks.java
+  - treats RGB image as a composite of 3 ByteGrey Images and uses super class to perform encryption and decryption
+  
