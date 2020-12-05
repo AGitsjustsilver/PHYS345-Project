@@ -14,7 +14,7 @@ public abstract class Rubiks implements AccessHelpers {
     private VectorKeys vectKey;
     private final int ITERATOR_MAX = 1; // the higher the more secure
 
-    private ImageProcessor ip;
+    protected ImageProcessor ip;
     protected final int WIDTH;
     protected final int HEIGHT;
 

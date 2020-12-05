@@ -49,7 +49,6 @@ public class ByteRubiks extends Rubiks {
             this.rowShift();
         }
 
-//        this.ip.setIntArray(this.imgArr);
     }
 
     /**
