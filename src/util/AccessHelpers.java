@@ -2,7 +2,7 @@ package util;
 
 public interface AccessHelpers {
 
-    void swap(int posA, int posB);
+    void swap(byte[] array, int posA, int posB);
 
     byte arrByteAccess(boolean rowcol, int iterator, int staticField);
     byte getByteKey(boolean key, int index);

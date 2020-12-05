@@ -28,7 +28,7 @@ public abstract class Rubiks implements AccessHelpers {
     }
 
     //methods
-    public boolean checkIteratorMax(int iter){
+    private boolean checkIteratorMax(int iter){
         return !(iter == ITERATOR_MAX);
     }
 
@@ -41,16 +41,67 @@ public abstract class Rubiks implements AccessHelpers {
         return ((rowcol)? (iterator+(staticField*this.WIDTH)): (staticField+(iterator*this.WIDTH)));
     }
 
+    public void encrypt(){
+        int iter = 0;
+        while (checkIteratorMax(iter)){
+            iter++;
+            this.rowShift();
+            this.colShift();
+            this.rowXOR();
+            this.colXOR();
+        }
+    }
+
+    public void decrypt(){
+        int iter = 0;
+
+        while(checkIteratorMax(iter)){
+            iter++;
+            this.colXOR();
+            this.rowXOR();
+            this.colShift();
+            this.rowShift();
+        }
+    }
+
+    /**
+     * Rotates the row/column of the image pixels based on the key
+     * @param d - The direction of the pixels being shifted
+     * @param index - The row or column index being shifted
+     * @param key - The vector key (True rVector, False cVector)
+     */
+    protected void shiftElements(byte[] byteArray, Direction d, int index, boolean key) {
+        // col = UP/DOWN = true
+        // row = LEFT/RIGHT = false;
+        boolean direction = (d == Direction.UP)||(d == Direction.DOWN);
+        int bound = ((direction)? this.WIDTH: this.HEIGHT)-1;
+        int a;
+        for (int keyShifts = 0; keyShifts < getIntKey(key, index); keyShifts++) {
+            if((d == Direction.DOWN) || (d == Direction.RIGHT)) {
+                for (int i = 0; i < bound; i++) {
+                    // shifts -> for RIGHT and DOWN
+                    a = this.position(direction, i, index);
+                    swap(byteArray, a, a + 1);
+                }
+                swap(byteArray,bound - 1, bound);
+            }else {
+                for (int i = bound; i > 0; i--) {
+                    // shifts <- for LEFT and UP
+                    a = this.position(direction, i, index);
+                    swap(byteArray,a - 1, a);
+                }
+                swap(byteArray,1, 0);
+            }
+        }
+    }
+
     // actions that each individual rubiks type has to do with
-    public abstract void encrypt();
-    public abstract void decrypt();
 
     protected abstract void rowShift();
     protected abstract void colShift();
     protected abstract void rowXOR();
     protected abstract void colXOR();
 
-    protected abstract void shiftElements(Direction direction, int index, boolean key);
     protected abstract void xorShift(int i, int j, boolean key);
     protected abstract void rotXorShift(int i, int j, boolean key);
 

@@ -1,6 +1,6 @@
 package algorithm;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import util.Direction;
 import util.VectorKeys;
 
@@ -16,74 +16,6 @@ public class ByteRubiks extends Rubiks {
     }
 
     @Override
-    public void encrypt() {
-//         Algorithm Steps
-//        * 1. Generate 2 different size arrays R and C
-//        * 2. Determine the max number of Iterations //
-        int iter = 0;
-
-        while (checkIteratorMax(iter)) {
-//        * 3. Increment iterator by 1
-            iter++;
-            this.rowShift();
-            this.colShift();
-            this.rowXOR();
-            this.colXOR();
-
-//        * 8. if iter and iterMax are equal then its done else go again
-        }
-
-        // update ImageProcessor
-//        this.ip.setIntArray(this.imgArr);
-    }
-
-    @Override
-    public void decrypt() {
-        int iter = 0;
-
-        while(checkIteratorMax(iter)){
-            iter++;
-            this.colXOR();
-            this.rowXOR();
-            this.colShift();
-            this.rowShift();
-        }
-
-    }
-
-    /**
-     * Rotates the row/column of the image pixels based on the key
-     * @param d - The direction of the pixels being shifted
-     * @param index - The row or column index being shifted
-     * @param key - The vector key (True rVector, False cVector)
-     */
-    @Override
-    protected void shiftElements(Direction d, int index, boolean key) {
-        // col = UP/DOWN = true
-        // row = LEFT/RIGHT = false;
-        boolean direction = (d == Direction.UP)||(d == Direction.DOWN);
-        int bound = ((direction)? this.WIDTH: this.HEIGHT)-1;
-        int a;
-        for (int keyShifts = 0; keyShifts < getIntKey(key, index); keyShifts++) {
-            if((d == Direction.DOWN) || (d == Direction.RIGHT)) {
-                for (int i = 0; i < bound; i++) {
-                    // shifts -> for RIGHT and DOWN
-                    a = this.position(direction, i, index);
-                    swap(a, a + 1);
-                }
-                swap(bound - 1, bound);
-            }else {
-                for (int i = bound; i > 0; i--) {
-                    // shifts <- for LEFT and UP
-                    a = this.position(direction, i, index);
-                    swap(a - 1, a);
-                }
-                swap(1, 0);
-            }
-        }
-    }
-
-    @Override
     protected void rowShift(){
         //        * 4. For each row of image:
         for(int row=0; row < this.WIDTH; row++) {
@@ -92,10 +24,10 @@ public class ByteRubiks extends Rubiks {
             // shift multiple times by the vector value at the index
             if(this.arrSum(true, row) % 2 == 0) {
 //        *   c. if 0 -> right circular shift
-                shiftElements(Direction.RIGHT, row, true);
+                shiftElements(this.byteArray, Direction.RIGHT, row, true);
             }else {
 //        *      else -> left circular shift
-                shiftElements(Direction.LEFT, row, true);
+                shiftElements(this.byteArray, Direction.LEFT, row, true);
             }
         }
     }
@@ -109,10 +41,10 @@ public class ByteRubiks extends Rubiks {
             // shift multiple times by the vector value at the index
             if(this.arrSum(false, col) % 2 == 0) {
 //        *   c. if 0 -> up circular shift
-                shiftElements(Direction.UP,col, false);
+                shiftElements(this.byteArray, Direction.UP,col, false);
             }else {
 //        *      else ->down circular shift
-                shiftElements(Direction.DOWN,col, false);
+                shiftElements(this.byteArray, Direction.DOWN,col, false);
             }
         }
     }
@@ -163,10 +95,10 @@ public class ByteRubiks extends Rubiks {
 
     // Inteface methods
     @Override
-    public void swap(int posA, int posB){
-        byte temp = this.byteArray[posA];
-        this.byteArray[posA] = this.byteArray[posB];
-        this.byteArray[posB] = temp;
+    public void swap(byte[] array,int posA, int posB){
+        byte temp = array[posA];
+        array[posA] = array[posB];
+        array[posB] = temp;
     }
 
     /**
@@ -200,8 +132,7 @@ public class ByteRubiks extends Rubiks {
         return this.getVectKey().getByteKey(key,index);
     }
 
-    @Ignore
-    public int arrIntAccess(boolean rowcol, int iterator, int staticField) {
+    public int arrIntAccess(boolean rowcol, int iterator, int staticField) throws NotImplementedException {
         return 0;
     }
 
@@ -210,8 +141,7 @@ public class ByteRubiks extends Rubiks {
         return this.getVectKey().getIntKey(key, index);
     }
 
-    @Ignore
-    public int[] arrSumRGB(boolean rowcol, int index) {
+    public int[] arrSumRGB(boolean rowcol, int index) throws NotImplementedException {
         return new int[0];
     }
 
