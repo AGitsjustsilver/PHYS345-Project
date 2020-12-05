@@ -1,3 +1,5 @@
+package util;
+
 import ij.ImagePlus;
 
 import java.math.BigInteger;
@@ -28,6 +30,10 @@ public class VectorKeys {
         // retrievals
     public BigInteger getKey(boolean key, int index){
         return ((key) ? this.rVector : this.cVector).get(index);
+    }
+
+    public byte getByteKey(boolean key, int index){
+        return getKey(key, index).byteValue();
     }
 
     public int getIntKey(boolean key, int index){
@@ -70,7 +76,7 @@ public class VectorKeys {
 
     @Override
     public String toString() {
-        return "VectorKeys{" +
+        return "util.VectorKeys{" +
                 "\nbitSize=" + bitSize +
                 "\n, rVector=" + rVector.toString() +
                 "\n, cVector=" + cVector.toString() +

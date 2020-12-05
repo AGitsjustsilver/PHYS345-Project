@@ -5,12 +5,16 @@
 * Code Written By: Alessandro Guaresti
 * */
 
+import algorithm.*;
+
 import ij.*;
 import ij.gui.*;
 import ij.io.LogStream;
-import ij.io.Opener;
 import ij.plugin.frame.PlugInFrame;
 import ij.process.ImageProcessor;
+
+import util.Choices;
+import util.VectorKeys;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -203,5 +207,11 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
         }
     }
 
-    public static void main(String[] args) {}
+    public static void main(String[] args) {
+        int w = 4, h = 3;
+        int[] arr = {0,1,2,3,
+                     4,5,6,7,
+                     8,9,10,11};
+
+    }
 }
