@@ -17,23 +17,23 @@ class Runner {
     ~ void runCommand(String command, ImagePlus imp)
 
 }
-class ByteRubiks {
+class algorithm.ByteRubiks {
     + _Rubiks(ImageJ imp, ImageProcessor ip)
     + void encrypt()
     + void decrypt()
 
 }
-class RGBRubiks {
+class algorithm.RGBRubiks {
     + _Rubiks(ImageJ imp, ImageProcessor ip)
     + void encrypt()
     + void decrypt()
 
 }
-class VectorKeys {
+class util.VectorKeys {
     ~ Vector<BigInteger> cVector
     ~ Vector<BigInteger> rVector
 }
-abstract class Rubiks {
+abstract class algorithm.Rubiks {
     {abstract} + void encrypt()
     {abstract} + void decrypt()
 }
@@ -42,11 +42,11 @@ class PlugInFrame
 class Thread
 
 
-RGBRubiks --|> ByteRubiks  : extends
-RGBRubiks --* Rubiks_ : contains
+algorithm.RGBRubiks --|> algorithm.ByteRubiks  : extends
+algorithm.RGBRubiks --* Rubiks_ : contains
 
-ByteRubiks --* Rubiks_ : contains
-ByteRubiks --|> Rubiks : extends
+algorithm.ByteRubiks --* Rubiks_ : contains
+algorithm.ByteRubiks --|> algorithm.Rubiks : extends
 
 Rubiks_ --|> PlugInFrame : extends
 Rubiks_ --|> ActionListener

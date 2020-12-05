@@ -40,13 +40,11 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
 
         setLayout(new FlowLayout());
         panel = new Panel();
-        panel.setLayout(new GridLayout(3,2,3,3));
+        panel.setLayout(new GridLayout(2,2,3,3));
         addButton("Reset", 0);
         addButton("New-Vectors", 1);
-        addButton("Grey-Encrypt",2 );
-        addButton("Grey-Decrypt", 3);
-        addButton("RGB-Encrypt", 4);
-        addButton("RGB-Decrypt", 5);
+        addButton("Encrypt",2 );
+        addButton("Decrypt", 3);
         add(panel);
 
         pack();
@@ -118,6 +116,7 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
             this.command = command;
             this.imp = imp;
             this.choice = (command.equals("Reset")||command.equals("New-Vectors"))? Choices.CMD: this.imageType();
+            System.out.println(choice);
             this.vect = v;
             this.rubiks = r;
             setPriority(Math.max(getPriority()-2, MIN_PRIORITY));
@@ -133,6 +132,7 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
                  case ImagePlus.GRAY32:
                      return Choices.GREY;
                  case ImagePlus.COLOR_256:
+                 case ImagePlus.COLOR_RGB:
                      return Choices.RGB;
                  default:
                      return Choices.CMD;
@@ -163,10 +163,10 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
             switch (this.choice){
                 case GREY:
                     rubiks = new ByteRubiks(ip,this.vect);
-                    if (command.equals("Grey-Encrypt")){
+                    if (command.equals("Encrypt")){
                         rubiks.encrypt();
                         msg = "Grey-Encrypt took: ";
-                    }else if (command.equals("Grey-Decrypt")) {
+                    }else if (command.equals("Decrypt")) {
                         rubiks.decrypt();
                         msg = "Grey-Decrypt took: ";
                     }
@@ -174,10 +174,10 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
                     break;
                 case RGB:
                     rubiks = new RGBRubiks(ip,this.vect);
-                    if (command.equals("RGB-Encrypt")) {
+                    if (command.equals("Encrypt")) {
                         rubiks.encrypt();
                         msg = "RGB-Encrypt took: ";
-                    }else if (command.equals("RGB-Decrypt")) {
+                    }else if (command.equals("Decrypt")) {
                         rubiks.decrypt();
                         msg = "RGB-Decrypt took: ";
                     }

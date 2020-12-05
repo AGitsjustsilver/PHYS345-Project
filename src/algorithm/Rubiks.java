@@ -45,10 +45,10 @@ public abstract class Rubiks implements AccessHelpers {
         int iter = 0;
         while (checkIteratorMax(iter)){
             iter++;
-            this.rowShift();
-            this.colShift();
-            this.rowXOR();
-            this.colXOR();
+            rowShift();
+            colShift();
+            rowXOR();
+            colXOR();
         }
     }
 
@@ -57,10 +57,10 @@ public abstract class Rubiks implements AccessHelpers {
 
         while(checkIteratorMax(iter)){
             iter++;
-            this.colXOR();
-            this.rowXOR();
-            this.colShift();
-            this.rowShift();
+            colXOR();
+            rowXOR();
+            colShift();
+            rowShift();
         }
     }
 
@@ -95,19 +95,55 @@ public abstract class Rubiks implements AccessHelpers {
         }
     }
 
+    protected void rowXOR(){
+        //        * 6. Using Vector Key C apply XOR to rows
+        for (int i = 0; i < this.WIDTH; i++) {
+            if (i%2!=0) {
+                // a. Image[2i-1][j] (odd rows) get regular XOR of C[j]
+                for (int j = 0; j < this.HEIGHT; j++) {
+                    xorShift(i,j,false);
+                }
+            }else {
+                // b. Image[2i][j] (even rows) get left bit shifted C[j]
+                for (int j = 0; j < this.HEIGHT; j++) {
+                    rotXorShift(i,j,false);
+                }
+            }
+        }
+    }
+
+    protected void colXOR(){
+        //        * 7. Using Vector Key R apply XOR to columns
+        for (int i = 0; i < this.WIDTH; i++) {
+            for (int j = 0; j < this.HEIGHT; j++) {
+                if(j%2!=0) {
+                    // a. Image[i][2j-1] (odd columns) get regular XOR of R[j]
+                    xorShift(i,j,true);
+                }else {
+                    // b. Image[i][2j] (even columns) get left bit shifted R[j]
+                    rotXorShift(i,j,true);
+                }
+            }
+        }
+    }
+
+    public byte getByteKey(boolean key, int index) {
+        return this.vectKey.getByteKey(key, index);
+    }
+
+    public int getIntKey(boolean key, int index) {
+        return this.vectKey.getIntKey(key,index);
+    }
+
     // actions that each individual rubiks type has to do with
 
     protected abstract void rowShift();
     protected abstract void colShift();
-    protected abstract void rowXOR();
-    protected abstract void colXOR();
 
     protected abstract void xorShift(int i, int j, boolean key);
     protected abstract void rotXorShift(int i, int j, boolean key);
 
     // object
-
-    //TODO: CHANGE
     @Override
     public String toString() {
         return "algorithm.Rubiks{" +

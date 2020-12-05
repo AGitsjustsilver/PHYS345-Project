@@ -6,6 +6,8 @@ import util.VectorKeys;
 
 import ij.process.ImageProcessor;
 
+import java.util.Arrays;
+
 public class RGBRubiks extends Rubiks {
 
     private int[] intArray;
@@ -20,23 +22,25 @@ public class RGBRubiks extends Rubiks {
 
     private void arrayInit(ImageProcessor ip){
         this.intArray = (int[])ip.getPixels();
-        int w = ip.getWidth(), h = ip.getHeight();
-        this.rArray = new byte[w*h];
-        this.gArray = new byte[w*h];
-        this.bArray = new byte[w*h];
-        for(int row = 0; row < w; row++){
-            for (int col = 0; col < h; col++) {
-                int val = this.intArray[col+(row*w)];
-                this.rArray[col+(row*w)] = (byte) (val & 0xff);
-                this.gArray[col+(row*w)] = (byte) ((val >> 8) & 0xff);
-                this.bArray[col+(row*w)] = (byte) ((val >> 16) & 0xff);
+        int len = this.intArray.length, w = ip.getWidth(), h = ip.getHeight(), pos = 0;
+        this.rArray = new byte[len];
+        this.gArray = new byte[len];
+        this.bArray = new byte[len];
+        for(int row = 0; row < h; row++){
+            for (int col = 0; col < w; col++) {
+                pos = (col + (row * w));
+                int val = this.intArray[pos];
+                this.rArray[pos] = (byte) (val & 0xff);
+                this.gArray[pos] = (byte) ((val >> 8) & 0xff);
+                this.bArray[pos] = (byte) ((val >> 16) & 0xff);
             }
         }
+        System.out.println("LEN: " + len + " POS: " + pos);
     }
 
     private void mergeChannels(){
-        for (int row = 0; row < this.WIDTH; row++) {
-            for (int col = 0; col < this.HEIGHT; col++) {
+        for (int row = 0; row < this.HEIGHT; row++) {
+            for (int col = 0; col < this.WIDTH; col++) {
                 this.intArray[col+(row*this.WIDTH)] = (this.rArray[col+(row*this.WIDTH)]) |
                                                       (this.gArray[col+(row*this.WIDTH)] << 8) |
                                                       (this.bArray[col+(row*this.WIDTH)] << 16);
@@ -50,12 +54,14 @@ public class RGBRubiks extends Rubiks {
     public void encrypt(){
         super.encrypt();
         this.mergeChannels();
+        ip.setPixels(this.intArray);
     }
 
     @Override
     public void decrypt(){
         super.decrypt();
         this.mergeChannels();
+        ip.setPixels(this.intArray);
     }
 
     @Override
@@ -86,17 +92,6 @@ public class RGBRubiks extends Rubiks {
         }
     }
 
-    @Override
-    protected void rowXOR() {
-
-    }
-
-    @Override
-    protected void colXOR() {
-
-    }
-
-
     private void shiftElements(int channel, Direction direction, int index, boolean key){
         byte[] temp = channelChoice(channel);
         assert temp!=null;
@@ -126,22 +121,20 @@ public class RGBRubiks extends Rubiks {
         return null;
     }
 
-
     @Override
     protected void xorShift(int i, int j, boolean key) {// will probably change the value of RGB within the int
-
+        int pos = (j + (i * this.WIDTH));
+        this.rArray[pos] = (byte) (this.rArray[pos] ^ this.getByteKey(key, j));
+        this.gArray[pos] = (byte) (this.gArray[pos] ^ this.getByteKey(key, j));
+        this.bArray[pos] = (byte) (this.bArray[pos] ^ this.getByteKey(key, j));
     }
 
     @Override
     protected void rotXorShift(int i, int j, boolean key) {// will probably change the value of RGB within the int
-
-    }
-
-
-    // object
-    @Override
-    public String toString() {
-        return super.toString();
+        int pos = (j + (i * this.WIDTH));
+        this.rArray[pos] = (byte) (this.rArray[pos] ^ (this.getByteKey(key, j) >> 1));
+        this.gArray[pos] = (byte) (this.gArray[pos] ^ (this.getByteKey(key, j) >> 1));
+        this.bArray[pos] = (byte) (this.bArray[pos] ^ (this.getByteKey(key, j) >> 1));
     }
 
     @Override
@@ -152,30 +145,14 @@ public class RGBRubiks extends Rubiks {
     }
 
     @Override
-    public byte arrByteAccess(boolean rowcol, int iterator, int staticField) {
+    public byte arrByteAccess(boolean rowcol, int iterator, int staticField) throws NotImplementedException{
         return 0;
     }
 
+
     @Override
-    public byte getByteKey(boolean key, int index) {
+    public int arrSum(boolean rowcol, int index) throws NotImplementedException{
         return 0;
-    }
-
-    @Override
-    public int arrSum(boolean rowcol, int index) {
-        int sum = 0;
-        for (int i : arrSumRGB(rowcol, index)) sum += i;
-        return sum;
-    }
-
-    @Override
-    public int arrIntAccess(boolean rowcol, int iterator, int staticField) {
-        return 0;
-    }
-
-    @Override
-    public int getIntKey(boolean key, int index) {
-        return this.getVectKey().getIntKey(key,index);
     }
 
     /**
@@ -187,11 +164,18 @@ public class RGBRubiks extends Rubiks {
     public int[] arrSumRGB(boolean rowcol, int pos){
         int[] sum = {0, 0, 0};
         for (int i = 0; i < ((rowcol)? this.WIDTH :this.HEIGHT); i++) {
-            int val = arrIntAccess(rowcol,i,pos);
-            sum[0] +=  val       & 0xff;
-            sum[1] += (val >> 8) & 0xff;
-            sum[2] += (val >>16) & 0xff;
+            int p = this.position(rowcol, i, pos);
+            sum[0] += this.rArray[p] & 0xff;
+            sum[1] += this.gArray[p] & 0xff;
+            sum[2] += this.bArray[p] & 0xff;
         }
         return sum;
     }
+
+    // object
+    @Override
+    public String toString() {
+        return super.toString() + Arrays.toString(this.intArray);
+    }
+
 }
