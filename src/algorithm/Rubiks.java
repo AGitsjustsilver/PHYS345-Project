@@ -1,5 +1,6 @@
 package algorithm;
 
+import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
 import util.AccessHelpers;
@@ -14,17 +15,17 @@ public abstract class Rubiks implements AccessHelpers {
     private VectorKeys vectKey;
     private final int ITERATOR_MAX = 1; // the higher the more secure
 
+    protected ImagePlus imPlus;
     protected ImageProcessor ip;
     protected final int WIDTH;
     protected final int HEIGHT;
 
-    public Rubiks(ImageProcessor imageProcessor, VectorKeys keys){
-        this.ip = imageProcessor;
+    public Rubiks(ImagePlus imagePlus, VectorKeys keys){
+        this.imPlus = imagePlus;
+        this.ip = imPlus.getProcessor().convertToByte(true);
         this.vectKey = keys;
         this.WIDTH = ip.getWidth();
         this.HEIGHT = ip.getHeight();
-
-//        this.imgArr = this.ip.getIntArray();
     }
 
     //methods

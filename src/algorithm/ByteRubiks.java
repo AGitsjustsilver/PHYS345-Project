@@ -1,18 +1,21 @@
 package algorithm;
 
+import ij.ImagePlus;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 import util.Direction;
 import util.VectorKeys;
 
 import ij.process.*;
 
+import java.util.Arrays;
+
 public class ByteRubiks extends Rubiks {
 
     private byte[] byteArray;
 
-    public ByteRubiks(ImageProcessor ip, VectorKeys keys){
-        super(ip, keys);
-        this.byteArray = (byte[])ip.getPixels();
+    public ByteRubiks(ImagePlus imagePlus, VectorKeys keys){
+        super(imagePlus, keys);
+        this.byteArray = (byte[])this.ip.getPixels();
     }
 
     @Override
@@ -32,9 +35,7 @@ public class ByteRubiks extends Rubiks {
 
 //        * 8. if iter and iterMax are equal then its done else go again
         }
-
-        // update ImageProcessor
-//        this.ip.setIntArray(this.imgArr);
+        System.out.println("Encrypted");
     }
 
     @Override
@@ -48,7 +49,7 @@ public class ByteRubiks extends Rubiks {
             this.colShift();
             this.rowShift();
         }
-
+        System.out.println("Decrypted");
     }
 
     /**
@@ -219,6 +220,9 @@ public class ByteRubiks extends Rubiks {
 
     @Override
     public String toString() {
-        return super.toString();
+        return super.toString() +
+                "\nByteRubiks{" +
+                "\nbyteArray=" + Arrays.toString(byteArray) +
+                "\n}";
     }
 }

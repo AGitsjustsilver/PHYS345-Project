@@ -16,7 +16,7 @@ public class VectorKeys {
     }
 
     public VectorKeys(ImagePlus imagePlus){
-        this(imagePlus.getBitDepth(), imagePlus.getWidth(), imagePlus.getHeight());
+        this(8, imagePlus.getWidth(), imagePlus.getHeight());
     }
 
     public VectorKeys(int bSize, int width, int height){

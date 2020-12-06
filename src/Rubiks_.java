@@ -45,7 +45,7 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
         addButton("New-Vectors", 1);
         addButton("Grey-Encrypt",2 );
         addButton("Grey-Decrypt", 3);
-        addButton("RGB-Encrypt", 4);
+        addButton("RGB-Encrypt",4);
         addButton("RGB-Decrypt", 5);
         add(panel);
 
@@ -120,6 +120,7 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
             this.choice = (command.equals("Reset")||command.equals("New-Vectors"))? Choices.CMD: this.imageType();
             this.vect = v;
             this.rubiks = r;
+            System.out.println(this.toString());
             setPriority(Math.max(getPriority()-2, MIN_PRIORITY));
             start();
         }
@@ -133,6 +134,7 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
                  case ImagePlus.GRAY32:
                      return Choices.GREY;
                  case ImagePlus.COLOR_256:
+                 case ImagePlus.COLOR_RGB:
                      return Choices.RGB;
                  default:
                      return Choices.CMD;
@@ -143,6 +145,7 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
             try {
                 runCommand(command, imp);
             } catch (OutOfMemoryError e){
+                System.out.println("OOPS");
                 IJ.outOfMemory(command);
                 if (imp!=null) imp.unlock();
             } catch (Exception e) {
@@ -162,26 +165,33 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
             String msg = "";
             switch (this.choice){
                 case GREY:
-                    rubiks = new ByteRubiks(ip,this.vect);
+                    rubiks = new ByteRubiks(imp,this.vect);
                     if (command.equals("Grey-Encrypt")){
                         rubiks.encrypt();
                         msg = "Grey-Encrypt took: ";
+                        System.out.println(rubiks.toString());
                     }else if (command.equals("Grey-Decrypt")) {
                         rubiks.decrypt();
                         msg = "Grey-Decrypt took: ";
+                        System.out.println(rubiks.toString());
+                    }else{
+                        msg = "Command Not Possible. Took: ";
                     }
-                    System.out.println(rubiks.toString());
                     break;
                 case RGB:
-                    rubiks = new RGBRubiks(ip,this.vect);
+                    rubiks = new RGBRubiks(imp,this.vect);
+                    System.out.println("Created");
                     if (command.equals("RGB-Encrypt")) {
                         rubiks.encrypt();
                         msg = "RGB-Encrypt took: ";
+                        System.out.println(rubiks.toString());
                     }else if (command.equals("RGB-Decrypt")) {
                         rubiks.decrypt();
                         msg = "RGB-Decrypt took: ";
+                        System.out.println(rubiks.toString());
+                    }else{
+                        msg = "Command Not Possible. Took: ";
                     }
-                    System.out.println(rubiks.toString());
                     break;
                 case CMD:
                     if (command.equals("Reset")){
@@ -205,13 +215,15 @@ public class Rubiks_ extends PlugInFrame implements ActionListener {
             imp.unlock();
             IJ.showStatus(msg + (System.currentTimeMillis()-startTime)+" milliseconds");
         }
+
+        @Override
+        public String toString() {
+            return "Runner{" +
+                    "\ncommand='" + command + '\'' +
+                    "\n, choice=" + choice +
+                    "\n}";
+        }
     }
 
-    public static void main(String[] args) {
-        int w = 4, h = 3;
-        int[] arr = {0,1,2,3,
-                     4,5,6,7,
-                     8,9,10,11};
-
-    }
+    public static void main(String[] args) { }
 }
